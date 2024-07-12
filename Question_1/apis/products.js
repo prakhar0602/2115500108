@@ -3,6 +3,9 @@ const express = require("express");
 const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 
+
+let a=[]
+
 function sort(z, parameter, method) {
   if (method == "ascending") {
     for (let i = 0; i < z.length - 1; i++) {
@@ -36,7 +39,15 @@ router.get("/categories/:categoryname/products", async (req, res) => {
     if (n > 10) {
       p = req.query.p;
     }
-    let token =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJNYXBDbGFpbXMiOnsiZXhwIjoxNzIwNzgyMTkyLCJpYXQiOjE3MjA3ODE4OTIsImlzcyI6IkFmZm9yZG1lZCIsImp0aSI6IjE0ZDRjZDAzLWMxOGYtNDMzNy05NjcxLWNmYmIwMTc2OGYzMCIsInN1YiI6InByYWtoYXIuZ3VwdGFfY3MuYWltbDIxQGdsYS5hYy5pbiJ9LCJjb21wYW55TmFtZSI6IkFmZm9yZCBNZWRpY2FsIiwiY2xpZW50SUQiOiIxNGQ0Y2QwMy1jMThmLTQzMzctOTY3MS1jZmJiMDE3NjhmMzAiLCJjbGllbnRTZWNyZXQiOiJZZWFaQ25UVWpkSFNIQ0phIiwib3duZXJOYW1lIjoiUHJha2hhciBHdXB0YSIsIm93bmVyRW1haWwiOiJwcmFraGFyLmd1cHRhX2NzLmFpbWwyMUBnbGEuYWMuaW4iLCJyb2xsTm8iOiIyMTE1NTAwMTA4In0.KiO9e3vQwTynKMYZP1ZdJb0qRNj6kVnP3Ip82IQg2QA"
+    let res1 = await axios.post('http://20.244.56.144/test/auth',{
+      "companyName": "Afford Medical",
+      "clientID": "14d4cd03-c18f-4337-9671-cfbb01768f30",
+      "clientSecret": "YeaZCnTUjdHSHCJa",
+      "ownerName": "Prakhar Gupta",
+      "ownerEmail": "prakhar.gupta_cs.aiml21@gla.ac.in",
+      "rollNo": "2115500108"
+    }) 
+    let token = res1.data.access_token
     let z = [];
     let zz = [];
     let companyNames = ["AMZ", "FLP", "SNP", "MYN", "AZO"];
@@ -49,7 +60,7 @@ router.get("/categories/:categoryname/products", async (req, res) => {
           },
         }
       );
-      zz.push(response.data);
+      z.push(response.data);
     } else {
       for (let y of companyNames) {
         let response = await axios.get(
@@ -60,7 +71,7 @@ router.get("/categories/:categoryname/products", async (req, res) => {
             },
           }
         );
-        z.push(response.data);
+        zz.push(response.data);
       }
       for (let i of zz) {
         for (let pro of i) {
@@ -70,7 +81,6 @@ router.get("/categories/:categoryname/products", async (req, res) => {
       zz = [];
     }
     if (parameter && method) z = sort(z, parameter, method);
-    console.log(z);
     if (p) {
       let test = [];
       for (let pro of z) {
@@ -82,18 +92,27 @@ router.get("/categories/:categoryname/products", async (req, res) => {
         }
       }
       if (test.length > 0) zz.push(test);
+      zz=zz[p]
     } else {
       for (let pro of z) {
         pro.id = uuidv4();
         zz.push(pro);
       }
     }
-    res.json(zz[p]);
+    a=zz
+    res.json(zz);
   } catch (e) {
-    console.log(e);
+    // console.log(e);
     console.log(e.message);
     res.json({ msg: "Error" });
   }
 });
+
+router.get('/categories/:categoryname/products/:productid',async(req,res)=>{
+  const {categoryname,productid}=req.params
+  let x=a.filter((s)=>s.id==productid)
+  x=x[0]
+  res.json(x)
+})
 
 module.exports = router;    
