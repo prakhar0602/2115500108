@@ -3,8 +3,7 @@ const express = require("express");
 const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 
-
-let a=[]
+let a = [];
 
 function sort(z, parameter, method) {
   if (method == "ascending") {
@@ -46,7 +45,7 @@ router.get("/categories/:categoryname/products", async (req, res) => {
       "ownerName": "Prakhar Gupta",
       "ownerEmail": "prakhar.gupta_cs.aiml21@gla.ac.in",
       "rollNo": "2115500108"
-    }) 
+    })
     let token = res1.data.access_token
     let z = [];
     let zz = [];
@@ -60,7 +59,7 @@ router.get("/categories/:categoryname/products", async (req, res) => {
           },
         }
       );
-      z.push(response.data);
+      z=response.data;
     } else {
       for (let y of companyNames) {
         let response = await axios.get(
@@ -80,6 +79,7 @@ router.get("/categories/:categoryname/products", async (req, res) => {
       }
       zz = [];
     }
+   
     if (parameter && method) z = sort(z, parameter, method);
     if (p) {
       let test = [];
@@ -92,27 +92,29 @@ router.get("/categories/:categoryname/products", async (req, res) => {
         }
       }
       if (test.length > 0) zz.push(test);
-      zz=zz[p]
+      zz = zz[p];
     } else {
       for (let pro of z) {
         pro.id = uuidv4();
         zz.push(pro);
       }
     }
-    a=zz
+    a = zz;
     res.json(zz);
   } catch (e) {
-    // console.log(e);
     console.log(e.message);
     res.json({ msg: "Error" });
   }
 });
 
-router.get('/categories/:categoryname/products/:productid',async(req,res)=>{
-  const {categoryname,productid}=req.params
-  let x=a.filter((s)=>s.id==productid)
-  x=x[0]
-  res.json(x)
-})
+router.get(
+  "/categories/:categoryname/products/:productid",
+  async (req, res) => {
+    const { categoryname, productid } = req.params;
+    let x = a.filter((s) => s.id == productid);
+    x = x[0];
+    res.json(x);
+  }
+);
 
-module.exports = router;    
+module.exports = router;
